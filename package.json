@@ -1,0 +1,26 @@
+{
+  "name": "ecotrack-carbon-footprint-platform",
+  "version": "1.0.0",
+  "description": "EcoTrack — A smart, personalised carbon footprint awareness and reduction platform powered by Claude AI.",
+  "main": "src/index.html",
+  "scripts": {
+    "test": "node tests/index.test.js",
+    "test:watch": "node --watch tests/index.test.js",
+    "start": "npx serve src -p 3000"
+  },
+  "keywords": [
+    "carbon-footprint",
+    "climate",
+    "sustainability",
+    "ai-assistant",
+    "ecotrack"
+  ],
+  "author": "EcoTrack Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

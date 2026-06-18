@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# Environment files — NEVER commit API keys
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
