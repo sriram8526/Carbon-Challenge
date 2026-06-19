@@ -1,0 +1,75 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run full test suite
+        run: node tests/run-all.js
+
+      - name: Verify HTML/app.js DOM ID consistency
+        run: |
+          node -e "
+            const fs = require('fs');
+            const html = fs.readFileSync('src/index.html', 'utf8');
+            const app  = fs.readFileSync('src/app.js', 'utf8');
+            const htmlIds = new Set([...html.matchAll(/id=\"([a-zA-Z0-9_-]+)\"/g)].map(m => m[1]));
+            const dynamicIds = new Set([...app.matchAll(/id=\"([a-zA-Z0-9_-]+)\"/g)].map(m => m[1]));
+            const appCalls = [...app.matchAll(/getElementById\([\"'\`]([a-zA-Z0-9_-]+)[\"'\`]\)/g)].map(m => m[1]);
+            const missing = appCalls.filter(id => !htmlIds.has(id) && !dynamicIds.has(id));
+            if (missing.length > 0) {
+              console.error('Missing DOM IDs:', missing);
+              process.exit(1);
+            }
+            console.log('All DOM ID references verified ✓');
+          "
+
+  repo-constraints:
+    name: Verify hackathon submission constraints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check repository size is under 10MB
+        run: |
+          SIZE_KB=$(du -sk --exclude=.git . | cut -f1)
+          SIZE_MB=$((SIZE_KB / 1024))
+          echo "Repository size: ${SIZE_MB}MB"
+          if [ "$SIZE_KB" -gt 10240 ]; then
+            echo "❌ Repository exceeds 10MB limit"
+            exit 1
+          fi
+          echo "✅ Repository size within limit"
+
+      - name: Check single-branch policy
+        run: |
+          BRANCH_COUNT=$(git branch -r | grep -v HEAD | wc -l)
+          echo "Remote branches: ${BRANCH_COUNT}"
+          if [ "$BRANCH_COUNT" -gt 1 ]; then
+            echo "❌ Repository must contain only one branch"
+            exit 1
+          fi
+          echo "✅ Single-branch policy satisfied"

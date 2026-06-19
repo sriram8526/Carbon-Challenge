@@ -1,7 +1,23 @@
-FROM nginx:alpine
-COPY src /usr/share/nginx/html
-# Cloud Run expects the container to listen on the port defined by the PORT environment variable.
-# By default Nginx listens on 80. Cloud Run handles port 80 properly now, but we can also use a custom template if needed.
-# For simplicity, Nginx on 80 works in Cloud Run if we don't override the port, Cloud Run defaults to 8080 but handles 80 if configured or we can substitute it.
-# Actually, let's use the default nginx and tell Cloud Run to use port 80.
-EXPOSE 80
+# EcoTrack — static asset container image
+#
+# Serves the zero-dependency single-page application via Nginx.
+# Suitable for Cloud Run, ECS, Kubernetes, or any container platform.
+#
+# Build:  docker build -t ecotrack .
+# Run:    docker run -p 8080:8080 ecotrack
+
+FROM nginx:1.27-alpine
+
+# Cloud Run, App Runner, and most managed platforms inject $PORT and expect
+# the container to listen on it. We template the Nginx config at startup
+# rather than hardcoding port 80, so the same image works locally and on
+# any managed platform without modification.
+ENV PORT=8080
+
+COPY src/ /usr/share/nginx/html/
+COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --quiet --tries=1 --spider http://localhost:${PORT}/index.html || exit 1

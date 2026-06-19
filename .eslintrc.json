@@ -1,0 +1,28 @@
+{
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "error",
+    "no-undef": "error",
+    "eqeqeq": ["error", "always"],
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "prefer-const": "error",
+    "no-var": "error",
+    "curly": "error",
+    "no-duplicate-imports": "error",
+    "no-shadow": "error",
+    "camelcase": ["error", { "properties": "never" }],
+    "max-len": ["warn", { "code": 100, "ignoreComments": true, "ignoreStrings": true }],
+    "max-lines-per-function": ["warn", { "max": 50, "skipComments": true }]
+  }
+}
